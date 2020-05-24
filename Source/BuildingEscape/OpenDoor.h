@@ -32,9 +32,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	class ATriggerVolume *PressureVolume;
 
-	UPROPERTY(EditAnywhere)
-	class AActor *ActorThatOpens;
-
 	float InitYaw;
 	float CurrentYaw;
 };

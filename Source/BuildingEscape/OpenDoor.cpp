@@ -3,13 +3,14 @@
 #include "OpenDoor.h"
 #include "GameFramework/Actor.h"
 #include "Engine/TriggerVolume.h"
+#include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 
 const float OpenedDoorYaw = 90.0f;
 
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
-	: PressureVolume(nullptr),
-	  ActorThatOpens(nullptr)
+	: PressureVolume(nullptr)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -38,11 +39,16 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (PressureVolume != nullptr &&
-		ActorThatOpens != nullptr &&
-		PressureVolume->IsOverlappingActor(ActorThatOpens))
+	APlayerController *PlayerController = GetWorld()->GetFirstPlayerController();
+	if (PlayerController != nullptr)
 	{
-		OpenDoor(DeltaTime);
+		APawn *CurrentPawn = PlayerController->GetPawn();
+		if (PressureVolume != nullptr &&
+			CurrentPawn != nullptr &&
+			PressureVolume->IsOverlappingActor(CurrentPawn))
+		{
+			OpenDoor(DeltaTime);
+		}
 	}
 }
 
