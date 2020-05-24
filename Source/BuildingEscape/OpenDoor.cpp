@@ -23,6 +23,11 @@ void UOpenDoor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (PressureVolume == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Pressure Volume shouldn't be null. Please assign!"));
+	}
+
 	InitYaw = GetOwner()->GetActorRotation().Yaw;
 	CurrentYaw = InitYaw;
 	TargetYaw = InitYaw + OpenedDoorYaw;
