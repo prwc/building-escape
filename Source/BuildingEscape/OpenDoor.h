@@ -24,14 +24,18 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 private:
-	void OpenDoor(float DeltaTime);
-
-	UPROPERTY(VisibleAnywhere)
-	float TargetYaw;
+	void MoveDoor(float TargetYaw, float Speed, float DeltaTime);
 
 	UPROPERTY(EditAnywhere)
 	class ATriggerVolume *PressureVolume;
 
-	float InitYaw;
+	UPROPERTY(EditAnywhere)
+	float OpenSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float CloseSpeed;
+
+	float ClosedYaw;
 	float CurrentYaw;
+	float OpenedYaw;
 };
