@@ -24,9 +24,17 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 private:
-	float InitYaw;
-	float CurrentYaw;
+	void OpenDoor(float DeltaTime);
 
 	UPROPERTY(VisibleAnywhere)
 	float TargetYaw;
+
+	UPROPERTY(EditAnywhere)
+	class ATriggerVolume *PressureVolume;
+
+	UPROPERTY(EditAnywhere)
+	class AActor *ActorThatOpens;
+
+	float InitYaw;
+	float CurrentYaw;
 };
