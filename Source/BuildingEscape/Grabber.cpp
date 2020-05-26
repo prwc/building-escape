@@ -6,10 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "DrawDebugHelpers.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
-	: Reach(100.0f)
+	: Reach(100.0f), HitActor(nullptr)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -26,11 +27,22 @@ void UGrabber::BeginPlay()
 	PhysicsHandleComponent = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
 	if (PhysicsHandleComponent != nullptr)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Found Physics handle component on %s"), *GetOwner()->GetName());
+		UE_LOG(LogTemp, Display, TEXT("Found UPhysicsHandleComponent on %s"), *GetOwner()->GetName());
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("No Physics handle component found on %s"), *GetOwner()->GetName());
+		UE_LOG(LogTemp, Error, TEXT("No UPhysicsHandleComponent found on %s"), *GetOwner()->GetName());
+	}
+
+	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+	if (InputComponent != nullptr)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Found UInputComponent on %s"), *GetOwner()->GetName());
+		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No UInputComponent on %s"), *GetOwner()->GetName());
 	}
 }
 
@@ -66,10 +78,29 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 				false,
 				GetOwner())))
 	{
-		AActor *HitActor = HitResult.GetActor();
-		if (HitActor != nullptr)
+		HitActor = HitResult.GetActor();
+	}
+	else
+	{
+		HitActor = nullptr;
+	}
+}
+
+void UGrabber::Grab()
+{
+	if (HitActor != nullptr)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Grab %s"), *HitActor->GetName());
+
+		UStaticMeshComponent *StaticMeshComponent = HitActor->FindComponentByClass<UStaticMeshComponent>();
+		if (StaticMeshComponent != nullptr)
 		{
-			UE_LOG(LogTemp, Display, TEXT("Hit Actor %s"), *HitActor->GetName());
+			UE_LOG(LogTemp, Display, TEXT("Found UStaticMeshComponent on %s"), *StaticMeshComponent->GetOwner()->GetName());
+			StaticMeshComponent->AddForce(FVector::UpVector * 100000.0f * StaticMeshComponent->GetMass());
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT("No target to grab."));
 	}
 }

@@ -24,8 +24,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 private:
+	void Grab();
+
 	UPROPERTY(EditAnywhere)
 	float Reach;
 
-	class UPhysicsHandleComponent* PhysicsHandleComponent;
+	class UPhysicsHandleComponent *PhysicsHandleComponent;
+	class UInputComponent *InputComponent;
+	class AActor *HitActor;
 };
