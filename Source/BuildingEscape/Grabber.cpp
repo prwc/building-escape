@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "DrawDebugHelpers.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
-#include "Components/StaticMeshComponent.h"
+#include "Components/PrimitiveComponent.h"
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
@@ -51,18 +51,16 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FVector ViewPointLocation;
-	FRotator ViewPointRotation;
-	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(ViewPointLocation, ViewPointRotation);
-
-	FVector LineTraceEnd = ViewPointLocation + ViewPointRotation.Vector() * Reach;
-
 	if (bDrawLineTrace)
 	{
+		FVector StartLineTrace;
+		FVector EndLineTrace;
+		FindLineTrace(StartLineTrace, EndLineTrace);
+
 		DrawDebugLine(
 			GetWorld(),
-			ViewPointLocation,
-			LineTraceEnd,
+			StartLineTrace,
+			EndLineTrace,
 			FColor::Red,
 			false,
 			0.0f,
@@ -70,11 +68,34 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 			5.0f);
 	}
 
+	if (PhysicsHandleComponent && PhysicsHandleComponent->GrabbedComponent)
+	{
+		FVector StartLineTrace;
+		FVector EndLineTrace;
+		FindLineTrace(StartLineTrace, EndLineTrace);
+
+		PhysicsHandleComponent->SetTargetLocation(EndLineTrace);
+	}
+}
+
+void UGrabber::Grab()
+{
+	if (PhysicsHandleComponent && PhysicsHandleComponent->GrabbedComponent)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Released %s"), *PhysicsHandleComponent->GrabbedComponent->GetOwner()->GetName());
+		PhysicsHandleComponent->ReleaseComponent();
+		return;
+	}
+
+	FVector StartLineTrace;
+	FVector EndLineTrace;
+	FindLineTrace(StartLineTrace, EndLineTrace);
+
 	FHitResult HitResult;
 	if (GetWorld()->LineTraceSingleByObjectType(
 			HitResult,
-			ViewPointLocation,
-			LineTraceEnd,
+			StartLineTrace,
+			EndLineTrace,
 			FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
 			FCollisionQueryParams(
 				FName(TEXT("")),
@@ -87,23 +108,25 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	{
 		HitActor = nullptr;
 	}
-}
 
-void UGrabber::Grab()
-{
 	if (HitActor != nullptr)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Grab %s"), *HitActor->GetName());
-
-		UStaticMeshComponent *StaticMeshComponent = HitActor->FindComponentByClass<UStaticMeshComponent>();
-		if (StaticMeshComponent != nullptr)
+		UPrimitiveComponent *PrimitiveComponent = HitActor->FindComponentByClass<UPrimitiveComponent>();
+		if (PrimitiveComponent != nullptr)
 		{
-			UE_LOG(LogTemp, Display, TEXT("Found UStaticMeshComponent on %s"), *StaticMeshComponent->GetOwner()->GetName());
-			StaticMeshComponent->AddForce(FVector::UpVector * 100000.0f * StaticMeshComponent->GetMass());
+			UE_LOG(LogTemp, Display, TEXT("Grab %s"), *PrimitiveComponent->GetOwner()->GetName());
+			PhysicsHandleComponent->GrabComponentAtLocation(PrimitiveComponent, NAME_None, HitActor->GetActorLocation());
 		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Display, TEXT("No target to grab."));
 	}
+}
+
+void UGrabber::FindLineTrace(FVector &Start, FVector &End)
+{
+	FRotator ViewPointRotation;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(Start, ViewPointRotation);
+	End = Start + ViewPointRotation.Vector() * Reach;
 }
