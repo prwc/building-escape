@@ -10,7 +10,7 @@
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
-	: Reach(100.0f), HitActor(nullptr)
+	: Reach(100.0f), HitActor(nullptr), bDrawLineTrace(false)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -57,15 +57,18 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	FVector LineTraceEnd = ViewPointLocation + ViewPointRotation.Vector() * Reach;
 
-	DrawDebugLine(
-		GetWorld(),
-		ViewPointLocation,
-		LineTraceEnd,
-		FColor::Red,
-		false,
-		0.0f,
-		0,
-		5.0f);
+	if (bDrawLineTrace)
+	{
+		DrawDebugLine(
+			GetWorld(),
+			ViewPointLocation,
+			LineTraceEnd,
+			FColor::Red,
+			false,
+			0.0f,
+			0,
+			5.0f);
+	}
 
 	FHitResult HitResult;
 	if (GetWorld()->LineTraceSingleByObjectType(

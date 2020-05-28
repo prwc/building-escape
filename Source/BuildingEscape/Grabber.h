@@ -29,6 +29,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	float Reach;
 
+	UPROPERTY(EditAnywhere)
+	bool bDrawLineTrace;
+
 	class UPhysicsHandleComponent *PhysicsHandleComponent;
 	class UInputComponent *InputComponent;
 	class AActor *HitActor;
