@@ -26,6 +26,10 @@ private:
 	void Grab();
 	void Release();
 	void FindLineTrace(FVector &Start, FVector &End);
+	void SetupInputComponent();
+	void FindPhysicsHandleComponent();
+	void UpdateDebugDrawLinTrace();
+	void UpdatePhysicsHandle();
 
 	UPROPERTY(EditAnywhere)
 	float Reach;
@@ -35,5 +39,4 @@ private:
 
 	class UPhysicsHandleComponent *PhysicsHandleComponent;
 	class UInputComponent *InputComponent;
-	class AActor *HitActor;
 };

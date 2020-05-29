@@ -10,7 +10,7 @@
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
-	: Reach(100.0f), bDrawLineTrace(false), HitActor(nullptr)
+	: Reach(100.0f), bDrawLineTrace(false)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -24,27 +24,8 @@ void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PhysicsHandleComponent = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
-	if (PhysicsHandleComponent != nullptr)
-	{
-		UE_LOG(LogTemp, Display, TEXT("Found UPhysicsHandleComponent on %s"), *GetOwner()->GetName());
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("No UPhysicsHandleComponent found on %s"), *GetOwner()->GetName());
-	}
-
-	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
-	if (InputComponent != nullptr)
-	{
-		UE_LOG(LogTemp, Display, TEXT("Found UInputComponent on %s"), *GetOwner()->GetName());
-		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
-		InputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("No UInputComponent on %s"), *GetOwner()->GetName());
-	}
+	FindPhysicsHandleComponent();
+	SetupInputComponent();
 }
 
 // Called every frame
@@ -52,31 +33,8 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (bDrawLineTrace)
-	{
-		FVector StartLineTrace;
-		FVector EndLineTrace;
-		FindLineTrace(StartLineTrace, EndLineTrace);
-
-		DrawDebugLine(
-			GetWorld(),
-			StartLineTrace,
-			EndLineTrace,
-			FColor::Red,
-			false,
-			0.0f,
-			0,
-			5.0f);
-	}
-
-	if (PhysicsHandleComponent && PhysicsHandleComponent->GrabbedComponent)
-	{
-		FVector StartLineTrace;
-		FVector EndLineTrace;
-		FindLineTrace(StartLineTrace, EndLineTrace);
-
-		PhysicsHandleComponent->SetTargetLocation(EndLineTrace);
-	}
+	UpdateDebugDrawLinTrace();
+	UpdatePhysicsHandle();
 }
 
 void UGrabber::Grab()
@@ -96,15 +54,7 @@ void UGrabber::Grab()
 				false,
 				GetOwner())))
 	{
-		HitActor = HitResult.GetActor();
-	}
-	else
-	{
-		HitActor = nullptr;
-	}
-
-	if (HitActor != nullptr)
-	{
+		AActor *HitActor = HitResult.GetActor();
 		UPrimitiveComponent *PrimitiveComponent = HitActor->FindComponentByClass<UPrimitiveComponent>();
 		if (PrimitiveComponent != nullptr)
 		{
@@ -132,4 +82,64 @@ void UGrabber::FindLineTrace(FVector &Start, FVector &End)
 	FRotator ViewPointRotation;
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(Start, ViewPointRotation);
 	End = Start + ViewPointRotation.Vector() * Reach;
+}
+
+void UGrabber::SetupInputComponent()
+{
+	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+	if (InputComponent != nullptr)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Found UInputComponent on %s"), *GetOwner()->GetName());
+		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+		InputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No UInputComponent on %s"), *GetOwner()->GetName());
+	}
+}
+
+void UGrabber::FindPhysicsHandleComponent()
+{
+	PhysicsHandleComponent = GetOwner()->FindComponentByClass<UPhysicsHandleComponent>();
+	if (PhysicsHandleComponent != nullptr)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Found UPhysicsHandleComponent on %s"), *GetOwner()->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No UPhysicsHandleComponent found on %s"), *GetOwner()->GetName());
+	}
+}
+
+void UGrabber::UpdateDebugDrawLinTrace()
+{
+	if (bDrawLineTrace)
+	{
+		FVector StartLineTrace;
+		FVector EndLineTrace;
+		FindLineTrace(StartLineTrace, EndLineTrace);
+
+		DrawDebugLine(
+			GetWorld(),
+			StartLineTrace,
+			EndLineTrace,
+			FColor::Red,
+			false,
+			0.0f,
+			0,
+			5.0f);
+	}
+}
+
+void UGrabber::UpdatePhysicsHandle()
+{
+	if (PhysicsHandleComponent && PhysicsHandleComponent->GrabbedComponent)
+	{
+		FVector StartLineTrace;
+		FVector EndLineTrace;
+		FindLineTrace(StartLineTrace, EndLineTrace);
+
+		PhysicsHandleComponent->SetTargetLocation(EndLineTrace);
+	}
 }
