@@ -10,7 +10,10 @@
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
-	: Reach(100.0f), bDrawLineTrace(false)
+	: Reach(100.0f),
+	  bDrawLineTrace(false),
+	  PhysicsHandleComponent(nullptr),
+	  InputComponent(nullptr)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -50,7 +53,7 @@ void UGrabber::Grab()
 			EndLineTrace,
 			FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
 			FCollisionQueryParams(
-				FName(TEXT("")),
+				NAME_None,
 				false,
 				GetOwner())))
 	{
