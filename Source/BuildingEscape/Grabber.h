@@ -30,6 +30,7 @@ private:
 	void FindPhysicsHandleComponent();
 	void UpdateDebugDrawLinTrace();
 	void UpdatePhysicsHandle();
+	bool LineTracePhysicsBodyActor(FHitResult &HitResult);
 
 	UPROPERTY(EditAnywhere)
 	float Reach;

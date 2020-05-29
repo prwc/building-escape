@@ -42,20 +42,8 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 void UGrabber::Grab()
 {
-	FVector StartLineTrace;
-	FVector EndLineTrace;
-	FindLineTrace(StartLineTrace, EndLineTrace);
-
 	FHitResult HitResult;
-	if (GetWorld()->LineTraceSingleByObjectType(
-			HitResult,
-			StartLineTrace,
-			EndLineTrace,
-			FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
-			FCollisionQueryParams(
-				NAME_None,
-				false,
-				GetOwner())))
+	if (LineTracePhysicsBodyActor(HitResult) && HitResult.GetActor() != nullptr)
 	{
 		AActor *HitActor = HitResult.GetActor();
 		UPrimitiveComponent *PrimitiveComponent = HitActor->FindComponentByClass<UPrimitiveComponent>();
@@ -145,4 +133,21 @@ void UGrabber::UpdatePhysicsHandle()
 
 		PhysicsHandleComponent->SetTargetLocation(EndLineTrace);
 	}
+}
+
+bool UGrabber::LineTracePhysicsBodyActor(FHitResult &HitResult)
+{
+	FVector StartLineTrace;
+	FVector EndLineTrace;
+	FindLineTrace(StartLineTrace, EndLineTrace);
+
+	return GetWorld()->LineTraceSingleByObjectType(
+		HitResult,
+		StartLineTrace,
+		EndLineTrace,
+		FCollisionObjectQueryParams(ECollisionChannel::ECC_PhysicsBody),
+		FCollisionQueryParams(
+			NAME_None,
+			false,
+			GetOwner()));
 }
