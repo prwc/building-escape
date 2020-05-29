@@ -25,6 +25,7 @@ public:
 
 private:
 	void Grab();
+	void Release();
 	void FindLineTrace(FVector &Start, FVector &End);
 
 	UPROPERTY(EditAnywhere)

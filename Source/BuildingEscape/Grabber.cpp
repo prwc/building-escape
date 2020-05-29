@@ -10,7 +10,7 @@
 
 // Sets default values for this component's properties
 UGrabber::UGrabber()
-	: Reach(100.0f), HitActor(nullptr), bDrawLineTrace(false)
+	: Reach(100.0f), bDrawLineTrace(false), HitActor(nullptr)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -39,6 +39,7 @@ void UGrabber::BeginPlay()
 	{
 		UE_LOG(LogTemp, Display, TEXT("Found UInputComponent on %s"), *GetOwner()->GetName());
 		InputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+		InputComponent->BindAction("Grab", IE_Released, this, &UGrabber::Release);
 	}
 	else
 	{
@@ -80,13 +81,6 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 void UGrabber::Grab()
 {
-	if (PhysicsHandleComponent && PhysicsHandleComponent->GrabbedComponent)
-	{
-		UE_LOG(LogTemp, Display, TEXT("Released %s"), *PhysicsHandleComponent->GrabbedComponent->GetOwner()->GetName());
-		PhysicsHandleComponent->ReleaseComponent();
-		return;
-	}
-
 	FVector StartLineTrace;
 	FVector EndLineTrace;
 	FindLineTrace(StartLineTrace, EndLineTrace);
@@ -121,6 +115,15 @@ void UGrabber::Grab()
 	else
 	{
 		UE_LOG(LogTemp, Display, TEXT("No target to grab."));
+	}
+}
+
+void UGrabber::Release()
+{
+	if (PhysicsHandleComponent && PhysicsHandleComponent->GrabbedComponent)
+	{
+		UE_LOG(LogTemp, Display, TEXT("Released %s"), *PhysicsHandleComponent->GrabbedComponent->GetOwner()->GetName());
+		PhysicsHandleComponent->ReleaseComponent();
 	}
 }
 
