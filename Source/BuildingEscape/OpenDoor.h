@@ -25,6 +25,7 @@ public:
 
 private:
 	void MoveDoor(float TargetYaw, float Speed, float DeltaTime);
+	float GetTotalOverlappingMass() const;
 
 	UPROPERTY(EditAnywhere)
 	class ATriggerVolume *PressureVolume;

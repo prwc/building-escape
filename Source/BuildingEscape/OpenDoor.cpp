@@ -48,17 +48,7 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 	if (PressureVolume != nullptr)
 	{
-		TArray<UPrimitiveComponent *> OverlappingPrimitiveComponents;
-		PressureVolume->GetOverlappingComponents(OverlappingPrimitiveComponents);
-		float SumMass = 0.0f;
-		for (auto PrimitiveComponent : OverlappingPrimitiveComponents)
-		{
-			if (PrimitiveComponent->IsSimulatingPhysics(NAME_None))
-			{
-				SumMass += PrimitiveComponent->GetMass();
-			}
-		}
-		if (SumMass >= RequiredMass)
+		if (GetTotalOverlappingMass() >= RequiredMass)
 		{
 			MoveDoor(OpenedYaw, OpenSpeed, DeltaTime);
 			return;
@@ -74,4 +64,19 @@ void UOpenDoor::MoveDoor(float TargetYaw, float Speed, float DeltaTime)
 	CurrentYaw = NewRotator.Yaw;
 	NewRotator.Yaw = FMath::FInterpConstantTo(NewRotator.Yaw, TargetYaw, DeltaTime, Speed);
 	GetOwner()->SetActorRotation(NewRotator);
+}
+
+float UOpenDoor::GetTotalOverlappingMass() const
+{
+	TArray<UPrimitiveComponent *> OverlappingPrimitiveComponents;
+	PressureVolume->GetOverlappingComponents(OverlappingPrimitiveComponents);
+	float TotalMass = 0.0f;
+	for (auto PrimitiveComponent : OverlappingPrimitiveComponents)
+	{
+		if (PrimitiveComponent->IsSimulatingPhysics(NAME_None))
+		{
+			TotalMass += PrimitiveComponent->GetMass();
+		}
+	}
+	return TotalMass;
 }
