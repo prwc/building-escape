@@ -24,8 +24,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 private:
-	void MoveDoor(float TargetYaw, float Speed, float DeltaTime);
+	bool MoveDoor(float TargetYaw, float Speed, float DeltaTime);
 	float GetTotalOverlappingMass() const;
+	void FindDoorSoundComponent();
 
 	UPROPERTY(EditAnywhere)
 	class ATriggerVolume *PressureVolume;
@@ -38,6 +39,15 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float RequiredMass;
+
+	UPROPERTY()
+	class UAudioComponent *DoorSoundComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	bool bDoorOpening;
+
+	UPROPERTY(VisibleAnywhere)
+	bool bDoorClosed;
 
 	float ClosedYaw;
 	float CurrentYaw;
