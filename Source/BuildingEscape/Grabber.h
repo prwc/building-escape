@@ -25,12 +25,12 @@ protected:
 private:
 	void Grab();
 	void Release();
-	void FindLineTrace(FVector &Start, FVector &End);
+	void FindLineTrace(FVector &Start, FVector &End) const;
 	void SetupInputComponent();
 	void FindPhysicsHandleComponent();
 	void UpdateDebugDrawLinTrace();
 	void UpdatePhysicsHandle();
-	bool LineTracePhysicsBodyActor(FHitResult &HitResult);
+	bool LineTracePhysicsBodyActor(FHitResult &HitResult) const;
 
 	UPROPERTY(EditAnywhere)
 	float Reach;

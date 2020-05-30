@@ -68,7 +68,7 @@ void UGrabber::Release()
 	}
 }
 
-void UGrabber::FindLineTrace(FVector &Start, FVector &End)
+void UGrabber::FindLineTrace(FVector &Start, FVector &End) const
 {
 	FRotator ViewPointRotation;
 	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(Start, ViewPointRotation);
@@ -135,7 +135,7 @@ void UGrabber::UpdatePhysicsHandle()
 	}
 }
 
-bool UGrabber::LineTracePhysicsBodyActor(FHitResult &HitResult)
+bool UGrabber::LineTracePhysicsBodyActor(FHitResult &HitResult) const
 {
 	FVector StartLineTrace;
 	FVector EndLineTrace;
