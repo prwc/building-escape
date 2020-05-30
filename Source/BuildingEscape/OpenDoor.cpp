@@ -5,16 +5,19 @@
 #include "Engine/TriggerVolume.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
+#include "Components/PrimitiveComponent.h"
 
 const float OpenedDoorYaw = 90.0f;
 const float DefaultOpenSpeed = 90.0f;
 const float DefaultCloseSpeed = DefaultOpenSpeed;
+const float DefaultRequiredMass = 50.0f;
 
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
 	: PressureVolume(nullptr),
 	  OpenSpeed(DefaultOpenSpeed),
-	  CloseSpeed(DefaultCloseSpeed)
+	  CloseSpeed(DefaultCloseSpeed),
+	  RequiredMass(DefaultRequiredMass)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -43,13 +46,19 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	APlayerController *PlayerController = GetWorld()->GetFirstPlayerController();
-	if (PlayerController != nullptr)
+	if (PressureVolume != nullptr)
 	{
-		APawn *CurrentPawn = PlayerController->GetPawn();
-		if (PressureVolume != nullptr &&
-			CurrentPawn != nullptr &&
-			PressureVolume->IsOverlappingActor(CurrentPawn))
+		TArray<UPrimitiveComponent *> OverlappingPrimitiveComponents;
+		PressureVolume->GetOverlappingComponents(OverlappingPrimitiveComponents);
+		float SumMass = 0.0f;
+		for (auto PrimitiveComponent : OverlappingPrimitiveComponents)
+		{
+			if (PrimitiveComponent->IsSimulatingPhysics(NAME_None))
+			{
+				SumMass += PrimitiveComponent->GetMass();
+			}
+		}
+		if (SumMass >= RequiredMass)
 		{
 			MoveDoor(OpenedYaw, OpenSpeed, DeltaTime);
 			return;

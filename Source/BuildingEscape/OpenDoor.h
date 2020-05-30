@@ -35,6 +35,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	float CloseSpeed;
 
+	UPROPERTY(EditAnywhere)
+	float RequiredMass;
+
 	float ClosedYaw;
 	float CurrentYaw;
 	float OpenedYaw;
