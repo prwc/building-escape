@@ -56,27 +56,12 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	{
 		if (GetTotalOverlappingMass() >= RequiredMass)
 		{
-			if (!bDoorOpening && DoorSoundComponent != nullptr)
-			{
-				DoorSoundComponent->Play();
-			}
-			bDoorClosed = false;
-			bDoorOpening = true;
-			MoveDoor(OpenedYaw, OpenSpeed, DeltaTime);
+			OpenDoor(DeltaTime);
 			return;
 		}
 	}
 
-	bool bMoveDoorClosed = MoveDoor(ClosedYaw, CloseSpeed, DeltaTime);
-	if (!bDoorClosed && bMoveDoorClosed)
-	{
-		bDoorOpening = false;
-		bDoorClosed = true;
-		if (DoorSoundComponent != nullptr)
-		{
-			DoorSoundComponent->Play();
-		}
-	}
+	CloseDoor(DeltaTime);
 }
 
 bool UOpenDoor::MoveDoor(float TargetYaw, float Speed, float DeltaTime)
@@ -101,6 +86,31 @@ float UOpenDoor::GetTotalOverlappingMass() const
 		}
 	}
 	return TotalMass;
+}
+
+void UOpenDoor::OpenDoor(float DeltaTime)
+{
+	if (!bDoorOpening && DoorSoundComponent != nullptr)
+	{
+		DoorSoundComponent->Play();
+	}
+	bDoorClosed = false;
+	bDoorOpening = true;
+	MoveDoor(OpenedYaw, OpenSpeed, DeltaTime);
+}
+
+void UOpenDoor::CloseDoor(float DeltaTime)
+{
+	bool bMoveDoorClosed = MoveDoor(ClosedYaw, CloseSpeed, DeltaTime);
+	if (!bDoorClosed && bMoveDoorClosed)
+	{
+		bDoorOpening = false;
+		bDoorClosed = true;
+		if (DoorSoundComponent != nullptr)
+		{
+			DoorSoundComponent->Play();
+		}
+	}
 }
 
 void UOpenDoor::FindDoorSoundComponent()

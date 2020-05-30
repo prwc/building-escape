@@ -27,6 +27,8 @@ private:
 	bool MoveDoor(float TargetYaw, float Speed, float DeltaTime);
 	float GetTotalOverlappingMass() const;
 	void FindDoorSoundComponent();
+	void OpenDoor(float DeltaTime);
+	void CloseDoor(float DeltaTime);
 
 	UPROPERTY(EditAnywhere)
 	class ATriggerVolume *PressureVolume;
