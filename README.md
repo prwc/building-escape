@@ -1,3 +1,3 @@
 # BuildingEscape
 
-Pratice C++ with Unreal Engine 4
+Practice C++ with Unreal Engine 4
